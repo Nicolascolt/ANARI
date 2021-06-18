@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
+    <link rel="stylesheet" href='/stylesheets/estillo.css'>
+    <title>Hello, world!</title>
+</head>
+
+<body>
+     <div class="menu-button">
+        <button type="button"><a href="http://localhost:3000/home">Home</a></button>
+    </div>
+
+
+    <!-- Modal -->
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Produto</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+
+
+                    <div id="card" class="card-group">
+
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    {{!-- <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button> --}}
+                    <button id="registra" type="button" class="btn btn-success" data-bs-toggle="modal"
+                        data-bs-target="#exampleModal">Registra</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<!--modal pesquisa-->
+ <div class="modal fade" id="exampleModal2" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Busca</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                     <div class="modal-label">
+                                <label></label>
+                                <input class="form-control" id="data-movimentacao" type="date" style= 'display:none'>
+                            </div>
+
+                            <div class="modal-label">
+                                <label>COD_PRODUTO</label>
+                                <input class="form-control" id="cod_produto" type="text">
+                            </div>
+
+                    <div id="card" class="card-group">
+
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    {{!-- <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button> --}}
+                    <button id="pesquisa-modal" type="button" class="btn btn-success" data-bs-toggle="modal"
+                        data-bs-target="#exampleModal2">Pesquisa</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="formulario">
+            <h1 class="title">SAIDA PRODUTO</h1>
+            <div class="row">
+                <form id="formulario" action="#" method="post">
+                    <div class="input-group mb-3">
+                        <input id="codigo" type="number" class="form-control" placeholder="Código do produto" required>
+
+                    </div>
+                    <div>
+                        <label>Quantidade</label>
+                        <input id="quantidade" class="form-control" type="number" placeholder="Quantidade" required>
+                    </div>
+            </div>
+
+            <div class="col-6">
+                <button id="confirma" type="button" class="btn btn-success" data-bs-toggle="modal"
+                    data-bs-target="#exampleModal">
+                    Confirma
+                </button>
+            </div>
+            </form>
+            <div class="col-6">
+                <button id="pesquisar" type="button" class="btn btn-success"data-bs-toggle="modal"
+                    data-bs-target="#exampleModal2">
+                    Pesquisa
+                </button>
+            </div>
+
+        </div>
+    </div>
+    <div class="pesquisa">
+        <table id="table" style="width:100%">
+            <tr>
+                <th>CARTAO_USUARIO</th>
+                <th>COD_PRODUTO</th>
+                <th>DATA_SAIDA</th>
+                <th>QUANTIDADE_SAIDA</th>
+                
+            </tr>
+
+
+        </table>
+    </div>
+    </div>
+    <script>
+        document.getElementById('confirma').addEventListener('click', () => {
+
+            const codigo = document.getElementById('codigo').value;
+            const quantidade = document.getElementById('quantidade').value;
+            if (!codigo || !quantidade) {
+                alert("preencha os camps corretamente")
+                window.location.reload();
+            } else {
+
+
+                var myHeaders = new Headers();
+                myHeaders.append("Content-Type", "application/json");
+
+                var raw = JSON.stringify({
+                    COD_PRODUTO: codigo,
+                    QUANTIDADE: quantidade
+                });
+
+                var requestOptions = {
+                    method: 'POST',
+                    headers: myHeaders,
+                    body: raw,
+                    redirect: 'follow'
+                };
+
+
+
+                fetch("http://localhost:3000/cadastro/produto/pesquisa", requestOptions)
+                    .then(response => response.json())
+                    .then(result => {
+
+                        if (result.length ==0){
+                            let x = confirm("produto não encotrado");
+                        if (x == true) {
+                            window.location.reload();
+                        } 
+                        }
+                        document.getElementById('card').innerHTML +=
+                            `
+                        <div class= col>
+                        <p>CATEGORIA_PRODUTO: ${result[0].CATEGORIA_PRODUTO}</p>
+                        <p>COD_FORNECEDOR: ${result[0].COD_FORNECEDOR}</p>
+                        <p>COD_PRODUTO: ${result[0].COD_PRODUTO}</p>
+                        <p>DEPARTAMENTO_PRODUTO:${result[0].DEPARTAMENTO_PRODUTO}</p>
+                        <p>GENERO_PRODUTO:${result[0].CATEGORIA_PRODUTO}</p>
+                        <p>TAMANHO_PRODUTO: ${result[0].TAMANHO_PRODUTO}</p>
+                        <p>TIPO_PRODUTO: ${result[0].TIPO_PRODUTO}</p>
+                        <h5>QUANTIDADE DE SAIDA: ${quantidade}</h5>
+                        </div>
+                        `
+                    })
+
+
+            }
+        });
+
+
+        document.getElementById('registra').addEventListener('click', () => {
+            const codigo = document.getElementById('codigo').value;
+            const quantidade = document.getElementById('quantidade').value;
+            var myHeaders = new Headers();
+            myHeaders.append("Content-Type", "application/json");
+            var raw = JSON.stringify({
+
+                COD_PRODUTO: codigo,
+                QUANTIDADE_PRODUTO: quantidade,
+                CARTAO_USUARIO: sessionStorage.getItem('cartao_usuario')
+                            });
+
+            var requestOptions = {
+                method: 'POST',
+                headers: myHeaders,
+                body: raw,
+                redirect: 'follow'
+            };
+
+            fetch("http://localhost:3000/produto/saida", requestOptions)
+                .then(response => response.json())
+                .then(result => {
+                
+                         let x = confirm(result.msg);
+                        if (x == true) {
+                            window.location.reload();
+                        } 
+                })
+                .catch(error => console.log('error', error));
+        })
+
+        document.getElementById('pesquisa-modal').addEventListener('click', () => {
+            const movimento = document.getElementById('data-movimentacao').value;
+            const codigo = document.getElementById('cod_produto').value;
+            const tabela = document.getElementById('table');
+
+            var myHeaders = new Headers();
+            myHeaders.append("Content-Type", "application/json");
+            var raw = JSON.stringify({
+                movimento: movimento,
+                cod_produto: codigo
+               
+            });
+
+            var requestOptions = {
+                method: 'POST',
+                headers: myHeaders,
+                body: raw,
+                redirect: 'follow'
+            };
+
+
+            fetch("http://localhost:3000/saida/pesquisa", requestOptions)
+                .then(response => response.json())
+                .then(result => {
+                    console.log(result)
+                     if(result.length == 0){
+         
+                         let x = confirm("não foram encontrados resultados")
+                        if (x == true) {
+                            window.location.reload();
+                        } 
+                    }
+                    result.forEach(data => {
+                        
+                    tabela.innerHTML += `<tr id= "dadost">
+                    <td>${data.CARTAO_USUARIO}</td>
+                    <td>${data.COD_PRODUTO}</td>
+                    <td>${data.DATA_MOVIMENTO}</td>
+                    <td>${data.QUANTIDADE_PRODUTO}</td>
+                 
+                </tr>`
+                })
+                })
+                .catch(error => console.log('error', error));
+        })
+         
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4" crossorigin="anonymous">
+    </script>
+</body>
+
+</html>
